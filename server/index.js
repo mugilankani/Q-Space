@@ -3,7 +3,14 @@ dotenv.config();
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { PromptTemplate } from "@langchain/core/prompts";
+import { LLMChain } from "langchain/chains";
+import { MongoClient } from "mongodb";
+import { pipeline } from '@xenova/transformers'
 
+const generateEmbeddings = await pipeline(
+    'feature-extraction',
+    'Xenova/all-MiniLM-L6-v2'
+)
 
 const systemPromptTemplate = PromptTemplate.fromTemplate(
   `Act as an expert in creating questions for learners.
@@ -118,7 +125,6 @@ const systemPromptTemplate = PromptTemplate.fromTemplate(
   Use this prompt to generate a comprehensive and balanced set of questions from the given content, categorized by difficulty level and type, ensuring they are formatted correctly in JSON, challenge the learners effectively, and comply with the specified constraints on question types.`
 );
 
-// Initialize the Google GenAI Model
 const model = new ChatGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_API_KEY,
   model: "gemini-1.5-flash",
@@ -135,14 +141,101 @@ const inputContent = `World War I[j] or the First World War (28 July 1914 – 11
 
 const options = "5,medium,all";
 
-const prompt = await systemPromptTemplate.format({
-  content: inputContent,
-  options: options,
-});
+const chain = new LLMChain({
+    llm: model,
+    prompt: systemPromptTemplate,
+  });
+  
+// const result = await chain.call({
+//     content: inputContent,
+//     options: options,
+// });
 
+// console.log(result.text);
 
-const res = await model.invoke([
-  ["human", prompt],
-]);
+const questionPromptTemplate = PromptTemplate.fromTemplate(
+    `Given a question, convert it to a standalone question. question: {question} standalone question:`
+);
 
-console.log(res.content);
+const questionChain = new LLMChain({
+    llm: model,
+    prompt: questionPromptTemplate,
+})
+
+const questionResult = await questionChain.call({
+    question: "I dont know much about history, I want to if united states participated in world war I?"
+})
+
+console.log(questionResult.text)
+
+const client = new MongoClient(process.env.MONGODB_ATLAS_URI);
+await client.connect()
+const namespace = "QSpace.Sample";
+const [dbName, collectionName] = namespace.split(".");
+const collection = client.db(dbName).collection(collectionName);
+
+async function embeddingFunction(text){
+
+    const result = await generateEmbeddings(text, {
+        pooling: 'mean',
+        normalize: true
+    })
+    return Array.from(result.data);
+}
+
+async function customVectorSearch(query, collection, embeddingFunction, topK = 5) {
+    try {
+      // Generate embedding for the query
+      const queryEmbedding = await embeddingFunction(query);
+  
+      // Perform the vector search
+      const results = await collection.aggregate([
+        {
+            '$vectorSearch': {
+              'index': 'vector_index', 
+              'path': 'embedding', 
+              'queryVector': queryEmbedding, 
+              'numCandidates': 150, 
+              'limit': 10
+            }
+          }, {
+            '$project': {
+              'text' : 1,
+              'score': {
+                '$meta': 'vectorSearchScore'
+              }
+            }
+          }
+      ]).toArray();
+  
+      return results;
+    } catch (error) {
+      console.error("Error in customVectorSearch:", error);
+      throw error;
+    }
+  }
+
+const searchResults = await customVectorSearch(questionResult.text, collection, embeddingFunction);
+const combinedText = searchResults.reduce((acc, current) => acc + ' ' + current.text, '');
+    // return combinedText;
+    // console.log("Search results:", combinedText);
+
+  const answerPromptTemplate = PromptTemplate.fromTemplate(
+    `Given a question answer the question based on the context provided. question: {question} context: {context} answer:`
+);
+
+const answerChain = new LLMChain({
+    llm: model,
+    prompt: answerPromptTemplate,
+})
+
+const answerResult = await answerChain.call({
+    question: questionResult.text,
+    context: combinedText
+})
+
+console.log(answerResult.text)
+
+await client.close();
+
+// console.log(res.content);

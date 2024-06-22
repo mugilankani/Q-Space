@@ -3,9 +3,9 @@ import cors from "cors"
 import multer from "multer"
 import fs from "fs"
 import { PDFExtract } from 'pdf.js-extract'
-
 import { generateQuiz } from "./generateQuestions.js"
 import { extractJsonFromText } from "./utils/extractJSON.js"
+import { answerQuestion } from "./generateAnswers.js"
 
 const app = express()
 const port = 3000
@@ -13,7 +13,6 @@ const port = 3000
 app.use(cors())
 app.use(express.json())
 
-// Configure multer for file uploads
 const upload = multer({ dest: "uploads/" })
 
 const pdfExtract = new PDFExtract()
@@ -35,9 +34,7 @@ app.use(logger)
 app.post("/generate-quiz", upload.single("file"), async (req, res) => {
     let content
     if (req.file) {
-        // If a file was uploaded
         if (req.file.mimetype === "application/pdf") {
-            // Handle PDF
             try {
                 const data = await pdfExtract.extract(req.file.path, {})
                 content = data.pages.map(page => page.content.map(item => item.str).join(' ')).join('\n')
@@ -46,15 +43,12 @@ app.post("/generate-quiz", upload.single("file"), async (req, res) => {
                 return res.status(500).json({ error: "Failed to extract PDF content" })
             }
         } else if (req.file.mimetype === "text/plain") {
-            // Handle text file
             content = fs.readFileSync(req.file.path, "utf8")
         } else {
             return res.status(400).json({ error: "Unsupported file type" })
         }
-        // Delete the uploaded file after processing
         fs.unlinkSync(req.file.path)
     } else if (req.body.content) {
-        // If text content was sent directly
         content = req.body.content
     } else {
         return res.status(400).json({ error: "No content provided" })
@@ -70,6 +64,13 @@ app.post("/generate-quiz", upload.single("file"), async (req, res) => {
     const quizObject = extractJsonFromText(quiz)
 
     res.json(quizObject)
+})
+
+app.get("/generate-answer",async (req,res) => {
+    const question = req.body.question
+    const result = await answerQuestion(question)
+    console.log(result.text)
+    res.json(result)
 })
 
 app.listen(port, () => {

@@ -1,8 +1,7 @@
 import dotenv from "dotenv"
 dotenv.config()
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
-import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai"
 import { PromptTemplate } from "@langchain/core/prompts"
+import { model } from "./model.js"
 
 const systemPromptTemplate = PromptTemplate.fromTemplate(
     `Act as an expert in creating questions for learners.
@@ -120,19 +119,6 @@ Advanced Instructions:
 
 Use this prompt to generate a comprehensive and balanced set of questions from the given content, categorized by difficulty level and type, ensuring they are formatted correctly in JSON, challenge the learners effectively, and comply with the specified constraints on question types.`,
 )
-
-// Initialize the Google GenAI Model
-const model = new ChatGoogleGenerativeAI({
-    apiKey: process.env.GOOGLE_API_KEY,
-    model: "gemini-1.5-flash",
-    maxOutputTokens: 1000000,
-    safetySettings: [
-        {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-        },
-    ],
-})
 
 const generateQuiz = async (inputContent, options) => {
     const prompt = await systemPromptTemplate.format({

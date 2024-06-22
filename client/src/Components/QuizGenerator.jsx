@@ -1,7 +1,7 @@
 import { useState } from "react"
 import axios from "axios"
 
-const QuizGenerator = () => {
+const QuizGenerator = ({ onQuizGenerated }) => {
     const [file, setFile] = useState(null)
     const [text, setText] = useState("")
     const [fileOption, setFileOption] = useState(true)
@@ -66,32 +66,36 @@ const QuizGenerator = () => {
     const handleClick = async () => {
         setLoading(true)
         try {
-            let content
+            const formData = new FormData()
             if (fileOption && file) {
-                content = await readFileContent(file)
+                formData.append("file", file)
             } else if (!fileOption && text) {
-                content = text
+                formData.append("content", text)
             } else {
                 throw new Error("No content provided")
             }
 
+            formData.append("difficulty", difficulty)
+            formData.append("questionCount", questionCount)
+            formData.append("questionType", questionType)
+
             const response = await axios.post(
                 "http://localhost:3000/generate-quiz",
+                formData,
                 {
-                    content,
-                    difficulty, // pass difficulty directly
-                    questionCount, // pass questionCount directly
-                    questionType, // pass questionType directly
-                },
-            )
-            setResponseText(response.data)
-            console.log(response.data)
-        } catch (error) {
-            console.error("Error generating quiz:", error)
-            setResponseText("An error occurred while generating the quiz.")
-        }
-        setLoading(false)
-    }
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                }
+              );
+              setResponseText(response.data);
+              onQuizGenerated(response.data);
+            } catch (error) {
+              console.error("Error generating quiz:", error);
+              setResponseText("An error occurred while generating the quiz.");
+            }
+            setLoading(false);
+          };
 
     return (
         <div className="w-full h-screen justify-center p-3 flex flex-col items-center gap-3">

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import History from "./Components/History";
 import "./App.css";
 import QuizManager from "./Components/Quiz";
+import Chat from "./Components/Chat";
 
 const App = () => {
   return (

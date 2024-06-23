@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import QuizGenerator from './QuizGenerator';
+import Chat from './Chat';
 
 const QuizManager = () => {
   const [quizData, setQuizData] = useState(null);
@@ -11,6 +12,7 @@ const QuizManager = () => {
   const [score, setScore] = useState(null);
   const [report, setReport] = useState({ correct: [], incorrect: [] });
   const [shortAnswers, setShortAnswers] = useState([]);
+  const [feedback,setFeedback] = useState()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +20,37 @@ const QuizManager = () => {
       setUserAnswers(Array(quizData.questions.length).fill(''));
       setShortAnswers(quizData.questions.filter(q => q.question_type === 'short answer'));
     }
-  }, [quizData]);
+    if(score !== null){
+      const getReport  = async () => {
+        let incorrectString = ""; // Initialize an empty string
+
+          for (let i = 0; i < report.incorrect.length; i++) {
+              const item = report.incorrect[i];
+              incorrectString += `Question: ${item.question} Correct Answer: ${item.correctAnswer} Your Answer: ${item.userAnswer}`;
+          }
+        await fetch("http://localhost:3000/generate-report", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json", 
+            },
+            body: JSON.stringify({
+                context: incorrectString
+            })
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                setFeedback(data); 
+                console.log(data); 
+            })
+            .catch(error => {
+                console.error("There was a problem with the fetch operation:", error);
+            });
+      }
+      getReport()
+    }
+  }, [quizData,score]);
 
   const handleQuizGenerated = (data) => {
     const sortedQuestions = [...data.questions].sort((a, b) => 
@@ -41,18 +73,17 @@ const QuizManager = () => {
     setCurrentQuestion(Math.min(quizData.questions.length - 1, currentQuestion + 1));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
       const newReport = { correct: [], incorrect: [] };
       let correctCount = 0;
-
+      
       quizData.questions.forEach((question, index) => {
         const userAnswer = userAnswers[index];
         const isCorrect = question.question_type === 'mcq' 
-          ? userAnswer === question.answer
-          : userAnswer.toLowerCase().includes(question.answer.toLowerCase());
-
+        ? userAnswer === question.answer
+        : userAnswer.toLowerCase().includes(question.answer.toLowerCase());
+        
         if (isCorrect) {
           correctCount++;
           newReport.correct.push({ question: question.question, answer: question.answer });
@@ -64,11 +95,11 @@ const QuizManager = () => {
           });
         }
       });
-
+      
       setScore(correctCount);
       setReport(newReport);
       setIsSubmitting(false);
-    }, 10000);
+    
   };
 
   if (!quizData) {
@@ -146,6 +177,7 @@ const QuizManager = () => {
             </div>
           </>
         ) : (
+          <>
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4 text-[#5C6CFF]">Quiz Completed!</h2>
             <p className="text-xl text-[#5C6CFF]">Your score: {score} out of {quizData.questions.length}</p>
@@ -162,7 +194,11 @@ const QuizManager = () => {
                 </p>
               ))}
             </div>
+            <h4>Feedback</h4>
+            <p className='text-blue-500'>{feedback &&feedback.text}</p>
           </div>
+          <Chat/>
+          </>
         )}
       </div>
       <div className="bg-[#5C6CFF] text-[#FBF4E2] p-4 flex justify-between items-center">

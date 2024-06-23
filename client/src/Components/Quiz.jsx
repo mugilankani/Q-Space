@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import QuizGenerator from './QuizGenerator';
 import Chat from './Chat';
+import { markdownToTxt } from 'markdown-to-txt';
+
 
 const QuizManager = () => {
   const [quizData, setQuizData] = useState(null);
@@ -102,6 +104,14 @@ const QuizManager = () => {
     
   };
 
+
+const feedbackText = feedback && feedback.text;
+
+// Convert Markdown to plain text using markdown-to-txt
+const plainTextFeedback = feedbackText ? markdownToTxt(feedbackText) : '';
+  
+  // Render the plain text feedback
+  
   if (!quizData) {
     return <QuizGenerator onQuizGenerated={handleQuizGenerated} />;
   }
@@ -195,7 +205,7 @@ const QuizManager = () => {
               ))}
             </div>
             <h4>Feedback</h4>
-            <p className='text-blue-500'>{feedback &&feedback.text}</p>
+            <p className='text-blue-500 text-left'>{plainTextFeedback}</p>
           </div>
           <Chat/>
           </>

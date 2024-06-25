@@ -16,17 +16,44 @@ An AI-driven app for learners to generate and practice questions from uploaded P
 
 ## How it Works ?
 
-1. Explaining the working of project
-2. Embed video of project demo
+1. The user uploads a PDF/TXT file or enters text content.
+2. The app generates questions based on the provided content.
+3. The user takes the test and receives feedback on their answers.
+4. Additionally, the user can ask the chatbot more questions related to the content.
 
-## Libraries used
+## Tech used
 
-Library Name - Version
+- React and Node.js
+- LangChain
+- Gemini 1.5 Flash
+- MongoDB Atlas
+- Transformers.js
 
 ## How to configure
 
-Instructions for setting up project
+1. Generate a `.env` file within the server directory and populate it with the variables found in the `.env.sample` file.
 
 ## How to Run
 
-Instructions for running
+### Prerequisites
+
+- Git (https://git-scm.com/)
+- Node.js (https://nodejs.org/en)
+- MongoDB Atlas (https://www.mongodb.com/products/platform/atlas-database)
+- Gemini 1.5 Flash API Key (https://deepmind.google/technologies/gemini/flash/)
+
+### Running Q Space
+
+Git clone the repository
+
+`git clone https://github.com/mugilankani/q-space`
+
+Open terminal and navigate to the project directory
+
+Run the command
+`npm install` wait for the installation to complete
+
+Start the web app using the command
+`npm run app`
+
+Go to http://localhost:5173/ to start using the web app.

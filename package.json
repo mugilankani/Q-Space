@@ -1,0 +1,14 @@
+{
+  "name": "q-space",
+  "version": "1.0.0",
+  "description": "An AI-driven app for learners to generate and practice questions.",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "scripts": {
+    "install": "concurrently --names \"NODE,VITE\" -c \"cyan,green\" \"cd client && npm install\" \"cd server && npm install\"",
+    "app": "concurrently --names \"NODE,VITE\" -c \"cyan,green\" \"cd client && npm run dev\" \"cd server && npm run dev\""
+  },
+  "license": "ISC"
+}

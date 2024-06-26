@@ -12,7 +12,7 @@ An AI-driven app for learners to generate and practice questions from uploaded P
 
 ## Link to product walkthrough
 
-[link to video](Link Here)
+[link to video](https://www.loom.com/share/5c9e402e81024a719a2fa57d493baa2c?sid=5dbf9772-7f3c-4cc4-aef7-04d0b2d1bbfe)
 
 ## How it Works ?
 

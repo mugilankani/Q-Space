@@ -31,7 +31,7 @@ export default function Chat() {
   // Function to handle user message input
   const respondToUser = async (userMessage) => {
     let message;
-    await fetch("http://localhost:3000/generate-answer", {
+    await fetch(`${import.meta.env.VITE_API_URI}/generate-answer`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

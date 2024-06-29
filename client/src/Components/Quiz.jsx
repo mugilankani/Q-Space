@@ -32,7 +32,7 @@ const QuizManager = () => {
           const item = report.incorrect[i];
           incorrectString += `Question: ${item.question} Correct Answer: ${item.correctAnswer} Your Answer: ${item.userAnswer}`;
         }
-        await fetch("http://localhost:3000/generate-report", {
+        await fetch(`${import.meta.env.VITE_API_URI}/generate-report`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

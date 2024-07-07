@@ -126,7 +126,7 @@ const QuizGenerator = ({ onQuizGenerated }) => {
           </div>
           {fileOption ? (
             <input
-              className="border rounded-xl shadow-2xl border-white/10 bg-white/5 p-3 file:rounded-md file:mr-3 file:border-0"
+              className="border rounded-xl shadow-2xl file:bg-[#555] file:text-white border-white/10 bg-white/5 p-3 file:rounded-md file:mr-3 file:border-0"
               type="file"
               accept=".txt,.pdf"
               onChange={handleFileChange}
@@ -151,7 +151,7 @@ const QuizGenerator = ({ onQuizGenerated }) => {
         <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
-          className="border border-white/15 rounded-lg p-2"
+          className="border border-white/15 rounded-lg p-2 bg-[#111] text-white"
         >
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
@@ -161,7 +161,7 @@ const QuizGenerator = ({ onQuizGenerated }) => {
         <select
           value={questionCount}
           onChange={(e) => setQuestionCount(Number(e.target.value))}
-          className="border border-white/15 rounded-lg p-2"
+          className="border border-white/15 rounded-lg p-2 bg-[#111] text-white"
         >
           <option value={5}>5 Questions</option>
           <option value={10}>10 Questions</option>
@@ -170,7 +170,7 @@ const QuizGenerator = ({ onQuizGenerated }) => {
         <select
           value={questionType}
           onChange={(e) => setQuestionType(e.target.value)}
-          className="border border-white/15 rounded-lg p-2"
+          className="border border-white/15 rounded-lg p-2 bg-[#111] text-white"
         >
           <option value="mcq">MCQ Only</option>
         </select>

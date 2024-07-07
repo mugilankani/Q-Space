@@ -137,7 +137,7 @@ export default function Chat() {
                 type="text"
                 ref={userInputRef}
                 placeholder="Type a message"
-                className="w-full px-3 pl-6 py-2 border border-white/20 rounded-l-full focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                className="w-full px-3 pl-6 py-2 border bg-black border-white/20 rounded-l-full focus:outline-none focus:ring-1 focus:ring-indigo-400"
                 onKeyPress={handleKeyPress}
               />
               <button

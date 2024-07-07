@@ -80,7 +80,7 @@ const QuizGenerator = ({ onQuizGenerated }) => {
       formData.append("questionType", questionType);
 
       const response = await axios.post(
-        "http://localhost:3000/generate-quiz",
+        `${import.meta.env.VITE_API_URI}/generate-quiz`,
         formData,
         {
           headers: {

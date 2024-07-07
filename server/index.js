@@ -83,5 +83,5 @@ app.post("/generate-report",async (req,res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`)
+    console.log(`Server running at ${import.meta.env.VITE_API_URI}:${port}`)
 })

@@ -6,9 +6,9 @@ An AI-driven app for learners to generate and practice questions from uploaded P
 
 ## Team members
 
-1. Mugilan(https://github.com/mugilankani)
-2. Anam(https://github.com/Anam-Ashraf7)
-3. Alwin(https://github.com/AlwinSunil)
+1. [Mugilan](https://github.com/mugilankani)
+2. [Anam](https://github.com/Anam-Ashraf7)
+3. [Alwin](https://github.com/AlwinSunil)
 
 ## Link to product walkthrough
 
